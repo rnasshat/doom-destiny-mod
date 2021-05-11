@@ -18,6 +18,7 @@ class Destiny_Perk : Object Play
     int c4;
 
     string perkName;
+    //TODO Perk icon; other meta info
     
     array<Actor> actors; //General purpose array of actors, for perk use
     Actor lastHit; //The last thing damaged by the player

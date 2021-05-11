@@ -4,6 +4,11 @@
 */
 class Destiny_Perk_Firefly : Destiny_Perk
 {
+    override void initializePerk()
+    {
+        perkName = "Firefly";
+    }
+
     override void onPrecisionHit()
     {
         if(lastHit.bCorpse)
