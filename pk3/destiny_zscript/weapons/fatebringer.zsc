@@ -1,0 +1,47 @@
+
+class Destiny_Weapon_Fatebringer : Destiny_Weapon
+{
+    override void BeginPlay()
+    {
+        perks.push(new("Destiny_Perk_Firefly"));
+    }
+
+    Default
+    {
+        Destiny_Weapon.AmmoSlot     DESTINYWEP_PRIMARY;
+        Destiny_Weapon.AmmoCapacity 40;
+        Destiny_Weapon.MagazineSize 12;
+
+        Weapon.AmmoType   "Clip";
+        Weapon.SlotNumber 1;
+    }
+
+    States
+    {
+    Ready:
+        FATE A 1 A_WeaponReady();
+        Loop;
+    Select:
+        FATE A 0 { invoker.activatePerks(PT_ONWEAPONSWAP); }
+        FATE A 1 A_Raise();
+        Wait;
+    Deselect:
+        FATE A 0 { invoker.activatePerks(PT_ONWEAPONSWAP); }
+        FATE A 1 A_Lower();
+        Wait;
+    Fire:
+        FATE F 3 Bright
+        {
+            A_StartSound("weapons/bottomdollar/fire", CHAN_WEAPON, volume: 0.75);
+            StandardHitscan(20); 
+            invoker.activatePerks(PT_ONWEAPONFIRED);
+        }
+        FATE CD  1;
+        FATE E   4;
+        FATE DCB 2; 
+        Goto Ready;
+    Flash:
+        TNT1 A 2 Bright A_Light1();
+        Goto LightDone;
+    }
+}

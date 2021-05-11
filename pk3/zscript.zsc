@@ -1,0 +1,11 @@
+version "4.3.3"
+
+#include "destiny_zscript/destiny_playerbase.zsc"
+#include "destiny_zscript/destiny_weaponbase.zsc"
+#include "destiny_zscript/perk.zsc"
+
+//Legendary Perks - Exotic perks will be contained within their weapon's file
+#include "destiny_zscript/perks/firefly.zsc"
+
+//Legendary weapons
+#include "destiny_zscript/weapons/fatebringer.zsc"

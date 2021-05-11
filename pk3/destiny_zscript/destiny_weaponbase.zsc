@@ -1,0 +1,161 @@
+/*
+    Base class for all weapons. Includes necessary helper functions
+    and variables, as well as dummy states for things that need them
+*/
+
+class Destiny_Weapon : Weapon
+{
+    enum Destiny_WeaponType
+    {
+        DESTINYWEP_PRIMARY,
+        DESTINYWEP_SPECIAL,
+        DESTINYWEP_HEAVY
+    }
+
+    enum Destiny_PerkTriggers //These correspond to functions in perk.zsc
+    {
+        PT_ONWEAPONFIRED,
+        PT_ONWEAPONRELOADED,
+        PT_ONWEAPONSWAP,
+
+        PT_ONAMMOPICKUP,
+        PT_ONORBPICKUP,
+
+        PT_ONENEMYSHOT,
+        PT_ONENEMYHURT,
+
+        PT_ONPRECISIONHIT,
+
+        PT_ONPLAYERHURT,
+        PT_ONPLAYERHEALED,
+    }
+    
+    int destinyAmmoType; 
+    int inventorySize;
+    int magSize;
+
+    //TODO variable reload speed scalar
+    //TODO variable fire rate scalar
+    //TODO variable mag size scalar
+    //TODO variable damage modifier
+    //TODO variable swap speed scalar
+    //TODO variable accuracy scalar
+    //TODO variable stability scalar
+    
+    property AmmoSlot     : destinyAmmoType;
+    property AmmoCapacity : inventorySize;
+    property MagazineSize : magSize;
+
+    array<Destiny_Perk> perks;
+    
+    override void PostBeginPlay()
+    {
+        //PostBeginPlay is used here so that perks can be randomly rolled
+        //in the BeginPlay function of individual weapon classes
+        for(int i = 0; i < perks.size(); i++)
+        {
+            perks[i].initializePerk();
+            perks[i].parentWeapon = Self;
+        }
+    }
+
+    override void Tick()
+    {
+        for(int i = 0; i < perks.size(); i++)
+            perks[i].onTick();
+    }
+
+    void activatePerks(int trigger) //Use the Destiny_PerkTriggers enum
+    {
+        for(int i = 0; i < perks.size(); i++)
+        {
+            Switch(trigger)
+            {
+              case PT_ONWEAPONFIRED:    perks[i].onWeaponFired();    break;
+              case PT_ONWEAPONRELOADED: perks[i].onWeaponReloaded(); break;
+              case PT_ONWEAPONSWAP:     perks[i].onWeaponSwap();     break;
+              case PT_ONAMMOPICKUP:     perks[i].onAmmoPickup();     break;
+              case PT_ONORBPICKUP:      perks[i].onOrbPickup();      break;
+              case PT_ONENEMYSHOT:      perks[i].onEnemyShot();      break;
+              case PT_ONENEMYHURT:      perks[i].onEnemyHurt();      break;
+              case PT_ONPRECISIONHIT:   perks[i].onPrecisionHit();   break;
+              case PT_ONPLAYERHURT:     perks[i].onPlayerHurt();     break;
+              case PT_ONPLAYERHEALED:   perks[i].onPlayerHealed();   break;
+            }
+        }
+    } //activatePerks will need to be called on individual weapons on the 
+      //appropriate frames, using the correct trigger
+
+    action void StandardHitscan //TODO fully implement this function
+    (   int damage, Name damageType = "none", class<Actor> puffType = "BulletPuff",
+        int flags = LAF_NORANDOMPUFFZ, double offsetz = 0.0, double offsetforward = 0.0,
+        double offsetside = 0.0, double distance = 2048.0 )
+    {
+        Actor                 p; //puff
+        int                   d; //damage done
+        FTranslatedLineTarget t;
+
+        [p, d] = LineAttack
+                 (
+                      invoker.Owner.angle, distance, invoker.Owner.pitch,
+                      0, "none", "HitTracer", LAF_NOINTERACT,
+                      t, offsetz, offsetforward, offsetside
+                 );
+
+        Actor victim = t.linetarget;
+        if(!victim)
+            return;
+
+        int targHeight = victim.Height;
+
+        LineAttack
+        (
+             invoker.Owner.angle, distance, invoker.Owner.pitch,
+             damage, damageType, puffType, flags,
+             null, offsetz, offsetforward, offsetside
+        );
+
+        invoker.activatePerks(PT_ONENEMYSHOT);
+        for(int i = 0; i < invoker.perks.size(); i++)
+            invoker.perks[i].lastHit = victim;
+
+        if(p.Pos.z >= victim.Pos.z + (targHeight - 16) )
+        {
+            victim.DamageMobj(p, invoker.Owner, damage/2, damageType);
+            invoker.activatePerks(PT_ONPRECISIONHIT);
+        }
+    }
+
+    Default
+    {
+        Weapon.BobStyle "Alpha";
+
+        Destiny_Weapon.AmmoSlot     DESTINYWEP_PRIMARY;
+        Destiny_Weapon.AmmoCapacity 100;
+        Destiny_Weapon.MagazineSize 10;
+    }
+
+    States
+    {
+
+    }
+}
+
+class HitTracer : Actor
+{
+    Default
+    {
+        Radius 0;
+        Height 0;
+
+        +NOBLOCKMAP
+        +NOSECTOR
+        +NOGRAVITY
+        +NOTELEPORT
+    }
+
+    override void PostBeginPlay()
+    {
+        Destroy();
+    }
+}

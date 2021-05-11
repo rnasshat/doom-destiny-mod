@@ -1,0 +1,54 @@
+/*
+    The classic firefly perk: On precision kill, create a damaging explosion!
+    Contains the perk class as well as the necessary separate explosion actor.
+*/
+class Destiny_Perk_Firefly : Destiny_Perk
+{
+    override void onPrecisionHit()
+    {
+        if(lastHit.bCorpse)
+        {
+            Actor a  = parentWeapon.Spawn
+            (
+                "Destiny_Firefly_Explode", lastHit.Pos + (0.0, 0.0, 36.0)
+            );
+            a.target = parentWeapon.Owner;
+            lastHit = null;
+        }
+    }
+}
+
+class Destiny_Firefly_Explode : Actor
+{
+    Default
+    {
+        RenderStyle "Add";
+
+        +NOGRAVITY
+        +NOBLOCKMAP
+        +NOTELEPORT
+        +FORCEXYBILLBOARD
+        +ROLLSPRITE
+        +BRIGHT
+    }
+    
+    override void BeginPlay()
+    {
+        Super.BeginPlay();
+
+        bXFlip = random(0, 1);
+        roll   = random(-50, 50);
+
+        scale.X = frandom(0.75, 1.25);
+        scale.Y = scale.X;
+    }
+
+    States
+    {
+    Spawn:
+        EXFX A        3 NoDelay A_StartSound("world/barrelx", CHAN_AUTO);
+        EXFX B        4         A_Explode(60, 196, 0, true, 64);
+        EXFX CDEFGHIJ 3;
+        Stop;
+    }
+}

@@ -1,0 +1,51 @@
+/*
+    Base perk class. All perks must inherit from this class.
+
+    Implements several empty virtual functions that can be filled
+    with perk effects, to be called by the base weapon class for
+    the appropriate triggers
+*/
+
+class Destiny_Perk : Object Play
+{
+    Destiny_Weapon parentWeapon;    //Reference to the weapon this perk
+                                    //is on; necessary for more advanced
+                                    //effects
+    
+    int c1; //General purpose counters, usage decided by descendants
+    int c2; //Example usage: time for effect duration, number of kills, etc.
+    int c3;
+    int c4;
+
+    string perkName;
+    
+    array<Actor> actors; //General purpose array of actors, for perk use
+    Actor lastHit; //The last thing damaged by the player
+
+    virtual void initializePerk()
+    {
+        c1 = 0;
+        c2 = 0;
+        c3 = 0;
+        c4 = 0;
+
+        perkName = "NULL";
+    }
+
+    virtual void onWeaponFired()    { }
+    virtual void onWeaponReloaded() { }
+    virtual void onWeaponSwap()     { }
+
+    virtual void onAmmoPickup()     { }
+    virtual void onOrbPickup()      { }
+
+    virtual void onEnemyShot()      { } //Enemy damaged by active weapon
+    virtual void onEnemyHurt()      { } //Enemy damaged from any player source
+
+    virtual void onPrecisionHit()   { }
+
+    virtual void onPlayerHurt()     { }
+    virtual void onPlayerHealed()   { }
+
+    virtual void onTick()           { }
+}

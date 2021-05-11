@@ -1,0 +1,11 @@
+
+weapons/bottomdollar/fire1 audio/weapons/botdolF_1.ogg
+weapons/bottomdollar/fire2 audio/weapons/botdolF_2.ogg
+weapons/bottomdollar/fire3 audio/weapons/botdolF_3.ogg
+
+$random weapons/bottomdollar/fire
+{
+    weapons/bottomdollar/fire1
+    weapons/bottomdollar/fire2
+    weapons/bottomdollar/fire3
+}
