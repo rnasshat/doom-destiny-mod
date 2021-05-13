@@ -11,6 +11,7 @@ class Destiny_Weapon_Fatebringer : Destiny_Weapon
         Destiny_Weapon.AmmoSlot     DESTINYWEP_PRIMARY;
         Destiny_Weapon.AmmoCapacity 40;
         Destiny_Weapon.MagazineSize 12;
+        Destiny_Weapon.Impact       20;
 
         Weapon.AmmoType   "Clip";
         Weapon.SlotNumber 1;
@@ -33,7 +34,7 @@ class Destiny_Weapon_Fatebringer : Destiny_Weapon
         FATE F 3 Bright
         {
             A_StartSound("weapons/bottomdollar/fire", CHAN_WEAPON, volume: 0.75);
-            StandardHitscan(20); 
+            StandardHitscan(); 
             invoker.activatePerks(PT_ONWEAPONFIRED);
         }
         FATE CD  1;

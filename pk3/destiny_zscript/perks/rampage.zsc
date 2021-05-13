@@ -1,0 +1,43 @@
+/*
+    Rampage: damage temporarily increases after every kill, with a max of 3 kills
+    c1 is the remaining tics for the buff; c2 is the number of kills
+*/
+class Destiny_Perk_Rampage : Destiny_Perk
+{
+    override void initializePerk()
+    {
+        Super.initializePerk();
+
+        perkName = "Rampage";
+    }
+
+    override void onEnemyShot()
+    {
+        if(!lastHit)
+            return;
+
+        if(lastHit.bCorpse)
+        {
+            c2 = min(3, c2 + 1);
+
+            c1 = 157; //Barely under 4.5 seconds
+            lastHit = null;
+        }
+    }
+
+    override void onTick()
+    {
+        if(c1 > 0 && c2 > 0)
+        {
+            c1--;
+            
+            int dmg = max(c2, parentWeapon.baseDamage * (0.22 * c2));
+            parentWeapon.modifiedDamage = parentWeapon.baseDamage + dmg;
+        }
+        else
+        {
+            parentWeapon.modifiedDamage = parentWeapon.baseDamage;
+            c2 = 0;
+        }
+    }
+}

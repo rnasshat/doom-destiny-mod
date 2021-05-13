@@ -52,7 +52,7 @@ class Destiny_Firefly_Explode : Actor
     {
     Spawn:
         EXFX A        3 NoDelay A_StartSound("world/barrelx", CHAN_AUTO);
-        EXFX B        4         A_Explode(60, 196, 0, true, 64);
+        EXFX B        4         A_Explode(60, 196, 0, true, 32);
         EXFX CDEFGHIJ 3;
         Stop;
     }

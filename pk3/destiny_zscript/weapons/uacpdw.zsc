@@ -3,7 +3,7 @@ class Destiny_Weapon_UACPDW : Destiny_Weapon
 {
     override void BeginPlay()
     {
-
+            perks.push(new("Destiny_Perk_Rampage"));
     }
 
     Default
@@ -11,6 +11,7 @@ class Destiny_Weapon_UACPDW : Destiny_Weapon
         Destiny_Weapon.AmmoSlot     DESTINYWEP_PRIMARY;
         Destiny_Weapon.AmmoCapacity 390;
         Destiny_Weapon.MagazineSize 39;
+        Destiny_Weapon.Impact       7;
 
         Weapon.AmmoType   "Clip";
         Weapon.SlotNumber 1;
@@ -33,10 +34,10 @@ class Destiny_Weapon_UACPDW : Destiny_Weapon
         PDWG B 1 Offset(0, 38)
         {
             A_StartSound("weapons/pistol", CHAN_WEAPON);
+            A_Overlay(PSP_FLASH, "Flash");
             A_OverlayFlags(PSP_FLASH, PSPF_ADDWEAPON | PSPF_RENDERSTYLE, true);
             A_OverlayRenderstyle(PSP_FLASH, STYLE_Add);
-            A_Overlay(PSP_FLASH, "Flash");
-            StandardHitscan(7); 
+            StandardHitscan(); 
             invoker.activatePerks(PT_ONWEAPONFIRED);
         }
         PDWG B 1 Offset(0, 48);

@@ -34,10 +34,12 @@ class Destiny_Weapon : Weapon
     int inventorySize;
     int magSize;
 
+    int baseDamage;
+    int modifiedDamage;
+
     //TODO variable reload speed scalar
     //TODO variable fire rate scalar
     //TODO variable mag size scalar
-    //TODO variable damage modifier
     //TODO variable swap speed scalar
     //TODO variable accuracy scalar
     //TODO variable stability scalar
@@ -45,6 +47,7 @@ class Destiny_Weapon : Weapon
     property AmmoSlot     : destinyAmmoType;
     property AmmoCapacity : inventorySize;
     property MagazineSize : magSize;
+    property Impact       : baseDamage;
 
     array<Destiny_Perk> perks;
     
@@ -52,6 +55,8 @@ class Destiny_Weapon : Weapon
     {
         //PostBeginPlay is used here so that perks can be randomly rolled
         //in the BeginPlay function of individual weapon classes
+        modifiedDamage = baseDamage;
+
         for(int i = 0; i < perks.size(); i++)
         {
             perks[i].initializePerk();
@@ -87,12 +92,12 @@ class Destiny_Weapon : Weapon
       //appropriate frames, using the correct trigger
 
     action void StandardHitscan //TODO fully implement this function
-    (   int damage, Name damageType = "none", class<Actor> puffType = "BulletPuff",
+    (   Name damageType = "none", class<Actor> puffType = "BulletPuff",
         int flags = LAF_NORANDOMPUFFZ, double offsetz = 0.0, double offsetforward = 0.0,
         double offsetside = 0.0, double distance = 2048.0 )
     {
         Actor                 p; //puff
-        int                   d; //damage done
+        int                   d; //damage dealt, unused
         FTranslatedLineTarget t;
 
         [p, d] = LineAttack
@@ -108,22 +113,23 @@ class Destiny_Weapon : Weapon
 
         int targHeight = victim.Height;
 
-        LineAttack
-        (
-             invoker.Owner.angle, distance, invoker.Owner.pitch,
-             damage, damageType, puffType, flags,
-             null, offsetz, offsetforward, offsetside
-        );
-
-        invoker.activatePerks(PT_ONENEMYSHOT);
         for(int i = 0; i < invoker.perks.size(); i++)
             invoker.perks[i].lastHit = victim;
 
+        LineAttack
+        (
+             invoker.Owner.angle, distance, invoker.Owner.pitch,
+             invoker.modifiedDamage, damageType, puffType, flags,
+             null, offsetz, offsetforward, offsetside
+        );
+
         if(p.Pos.z >= victim.Pos.z + (targHeight - 16) )
         {
-            victim.DamageMobj(p, invoker.Owner, damage/2, damageType);
+            victim.DamageMobj(p, invoker.Owner, invoker.modifiedDamage/2, damageType);
             invoker.activatePerks(PT_ONPRECISIONHIT);
         }
+
+        invoker.activatePerks(PT_ONENEMYSHOT);
     }
 
     Default
