@@ -1,0 +1,49 @@
+
+class Destiny_Weapon_UACPDW : Destiny_Weapon
+{
+    override void BeginPlay()
+    {
+
+    }
+
+    Default
+    {
+        Destiny_Weapon.AmmoSlot     DESTINYWEP_PRIMARY;
+        Destiny_Weapon.AmmoCapacity 390;
+        Destiny_Weapon.MagazineSize 39;
+
+        Weapon.AmmoType   "Clip";
+        Weapon.SlotNumber 1;
+    }
+
+    States
+    {
+    Ready:
+        PDWG A 1 A_WeaponReady();
+        Loop;
+    Select:
+        PDWG A 0 { invoker.activatePerks(PT_ONWEAPONSWAP); }
+        PDWG A 1 A_Raise();
+        Wait;
+    Deselect:
+        PDWG A 0 { invoker.activatePerks(PT_ONWEAPONSWAP); }
+        PDWG A 1 A_Lower();
+        Wait;
+    Fire:
+        PDWG B 1
+        {
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
+            A_OverlayFlags(PSP_FLASH, PSPF_ADDWEAPON | PSPF_RENDERSTYLE, true);
+            A_OverlayRenderstyle(PSP_FLASH, STYLE_Add);
+            A_Overlay(PSP_FLASH, "Flash");
+            StandardHitscan(3); 
+            invoker.activatePerks(PT_ONWEAPONFIRED);
+        }
+        PDWG B 1;
+        PDWG A 1;
+        Goto Ready;
+    Flash:
+        PDWF A 1 Bright A_Light1();
+        Goto LightDone;
+    }
+}

@@ -9,3 +9,4 @@ version "4.3.3"
 
 //Legendary weapons
 #include "destiny_zscript/weapons/fatebringer.zsc"
+#include "destiny_zscript/weapons/uacpdw.zsc"
