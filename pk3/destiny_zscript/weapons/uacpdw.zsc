@@ -30,17 +30,17 @@ class Destiny_Weapon_UACPDW : Destiny_Weapon
         PDWG A 1 A_Lower();
         Wait;
     Fire:
-        PDWG B 1
+        PDWG B 1 Offset(0, 38)
         {
             A_StartSound("weapons/pistol", CHAN_WEAPON);
             A_OverlayFlags(PSP_FLASH, PSPF_ADDWEAPON | PSPF_RENDERSTYLE, true);
             A_OverlayRenderstyle(PSP_FLASH, STYLE_Add);
             A_Overlay(PSP_FLASH, "Flash");
-            StandardHitscan(3); 
+            StandardHitscan(7); 
             invoker.activatePerks(PT_ONWEAPONFIRED);
         }
-        PDWG B 1;
-        PDWG A 1;
+        PDWG B 1 Offset(0, 48);
+        PDWG A 1 Offset(0, 40);
         Goto Ready;
     Flash:
         PDWF A 1 Bright A_Light1();
