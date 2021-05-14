@@ -4,6 +4,7 @@ class Destiny_Weapon_UACPDW : Destiny_Weapon
     override void BeginPlay()
     {
             perks.push(new("Destiny_Perk_Rampage"));
+            perks.push(new("Destiny_Perk_Outlaw"));
     }
 
     Default
@@ -20,7 +21,7 @@ class Destiny_Weapon_UACPDW : Destiny_Weapon
     States
     {
     Ready:
-        PDWG A 1 A_WeaponReady();
+        PDWG A 1 A_WeaponReady(WRF_ALLOWRELOAD);
         Loop;
     Select:
         PDWG A 0 { invoker.activatePerks(PT_ONWEAPONSWAP); }
@@ -31,6 +32,15 @@ class Destiny_Weapon_UACPDW : Destiny_Weapon
         PDWG A 1 A_Lower();
         Wait;
     Fire:
+        PDWG B 0 
+        {
+            invoker.roundsInMag--;
+
+            if(invoker.roundsInMag <= 0)
+                return ResolveState("Reload");
+            else 
+                return State(null);
+        }
         PDWG B 1 Offset(0, 38)
         {
             A_StartSound("weapons/pistol", CHAN_WEAPON);
@@ -46,5 +56,16 @@ class Destiny_Weapon_UACPDW : Destiny_Weapon
     Flash:
         PDWF A 1 Bright A_Light1();
         Goto LightDone;
+    Reload:
+        PDWG CDE 5 A_SetTics(5/invoker.reloadSpeedDivisor);
+        PDWG F   8 A_SetTics(8/invoker.reloadSpeedDivisor);
+        PDWG E   3
+        {
+            A_SetTics(3/invoker.reloadSpeedDivisor);
+            invoker.roundsInMag = invoker.magSize;
+        }
+        PDWG DC  3 A_SetTics(3/invoker.reloadSpeedDivisor);
+        PDWG C   0 { invoker.activatePerks(PT_ONWEAPONRELOADED); }
+        Goto Ready;
     }
 }

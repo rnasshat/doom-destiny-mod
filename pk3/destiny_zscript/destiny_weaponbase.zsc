@@ -34,6 +34,10 @@ class Destiny_Weapon : Weapon
     int inventorySize;
     int magSize;
 
+    int reloadSpeedDivisor;
+
+    int roundsInMag;
+
     int baseDamage;
     int modifiedDamage;
 
@@ -56,6 +60,8 @@ class Destiny_Weapon : Weapon
         //PostBeginPlay is used here so that perks can be randomly rolled
         //in the BeginPlay function of individual weapon classes
         modifiedDamage = baseDamage;
+        roundsInMag = magSize;
+        reloadSpeedDivisor = 1;
 
         for(int i = 0; i < perks.size(); i++)
         {

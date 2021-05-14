@@ -1,0 +1,38 @@
+/*
+    Outlaw: boosts reload speed for a few seconds after precision kill
+    c1 is the timer counter
+*/
+class Destiny_Perk_Outlaw : Destiny_Perk
+{
+    override void initializePerk()
+    {
+        Super.initializePerk();
+
+        perkName = "Outlaw";
+    }
+
+    override void onPrecisionHit()
+    {
+        if(!lastHit)
+            return;
+        
+        if(lastHit.bCorpse)
+        {
+            c1 = 175; //5 seconds
+            parentWeapon.reloadSpeedDivisor = 2;
+        }
+    }
+
+    override void onWeaponReloaded()
+    {
+        c1 = 0;
+    }
+
+    override void onTick()
+    {
+        if(c1 > 0)
+            c1--;
+        else
+            parentWeapon.reloadSpeedDivisor = 1;
+    }
+}
