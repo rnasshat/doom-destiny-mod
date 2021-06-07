@@ -1,0 +1,72 @@
+/*
+    The Mateba from lithium. Fits roughly into the 180RPM archetype
+*/
+
+class Destiny_Weapon_LithMateba : Destiny_Weapon
+{
+    override void BeginPlay()
+    {
+            perks.push(new("Destiny_Perk_Firefly"));
+            perks.push(new("Destiny_Perk_Outlaw"));
+    }
+
+    Default
+    {
+        Destiny_Weapon.AmmoSlot     DESTINYWEP_PRIMARY;
+        Destiny_Weapon.AmmoCapacity 84;
+        Destiny_Weapon.MagazineSize 12;
+        Destiny_Weapon.Impact       16;
+
+        Weapon.AmmoType   "Clip";
+        Weapon.SlotNumber 1;
+    }
+
+    States
+    {
+    Ready:
+        MTBG A 1 A_WeaponReady(WRF_ALLOWRELOAD);
+        Loop;
+    Select:
+        MTBG A 0 { invoker.activatePerks(PT_ONWEAPONSWAP); }
+        MTBG A 1 A_Raise();
+        Wait;
+    Deselect:
+        MTBG A 0 { invoker.activatePerks(PT_ONWEAPONSWAP); }
+        MTBG A 1 A_Lower();
+        Wait;
+    Fire: 
+        MTBG B 0 
+        {
+            invoker.roundsInMag--;
+
+            if(invoker.roundsInMag <= 0)
+                return ResolveState("Reload");
+            else 
+                return State(null);
+        }
+        MTBG B 1
+        {
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
+            StandardHitscan(); 
+            invoker.activatePerks(PT_ONWEAPONFIRED);
+        }
+        MTBG C 1;
+        MTBG G 6;
+        MTBG F 4;
+        Goto Ready;
+    Flash:
+        TNT1 A 1 Bright A_Light1();
+        Goto LightDone;
+  /*  Reload: //TODO
+        TNT1 CDE 5 A_SetTics(5/invoker.reloadSpeedDivisor);
+        TNT1 F   8 A_SetTics(8/invoker.reloadSpeedDivisor);
+        TNT1 E   3
+        {
+            A_SetTics(3/invoker.reloadSpeedDivisor);
+            invoker.roundsInMag = invoker.magSize;
+        }
+        TNT1 DC  3 A_SetTics(3/invoker.reloadSpeedDivisor);
+        TNT1 C   0 { invoker.activatePerks(PT_ONWEAPONRELOADED); }
+        Goto Ready; */
+    }
+}
